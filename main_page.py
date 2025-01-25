@@ -1,19 +1,27 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
-import os
-from dotenv import load_dotenv
 import firebase_admin
 from firebase_admin import credentials
 import json
 import requests
 
-# Load environment variables
-load_dotenv()
-
 # Initialize Firebase only if it's not already initialized
 if not firebase_admin._apps:
-    cred = credentials.Certificate("authentication-31d27-090cbf89d0ac.json")
+    firebase_config = {
+        "type": st.secrets["type"],
+        "project_id": st.secrets["project_id"],
+        "private_key_id": st.secrets["private_key_id"],
+        "private_key": st.secrets["private_key"],
+        "client_email": st.secrets["client_email"],
+        "client_id": st.secrets["client_id"],
+        "auth_uri": st.secrets["auth_uri"],
+        "token_uri": st.secrets["token_uri"],
+        "auth_provider_x509_cert_url": st.secrets["auth_provider_x509_cert_url"],
+        "client_x509_cert_url": st.secrets["client_x509_cert_url"]
+    }
+    cred = credentials.Certificate(firebase_config)
     firebase_admin.initialize_app(cred)
+
 
 # Sign-Up/Sign-In Functions
 def sign_up_with_email_and_password(email, password, username=None, return_secure_token=True):
@@ -27,13 +35,14 @@ def sign_up_with_email_and_password(email, password, username=None, return_secur
         if username:
             payload["displayName"] = username
         payload = json.dumps(payload)
-        r = requests.post(rest_api_url, params={"key": "AIzaSyALebezYE7_X1heM1sypIeAJmWI8QyModQ"}, data=payload)
+        r = requests.post(rest_api_url, params={"key": st.secrets["firebase_api_key"]}, data=payload)
         try:
             return r.json()['email']
         except:
             st.warning(r.json())
     except Exception as e:
         st.warning(f'Signup failed: {e}')
+
 
 def sign_in_with_email_and_password(email=None, password=None, return_secure_token=True):
     rest_api_url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword"
@@ -46,7 +55,7 @@ def sign_in_with_email_and_password(email=None, password=None, return_secure_tok
         if password:
             payload["password"] = password
         payload = json.dumps(payload)
-        r = requests.post(rest_api_url, params={"key": "AIzaSyALebezYE7_X1heM1sypIeAJmWI8QyModQ"}, data=payload)
+        r = requests.post(rest_api_url, params={"key": st.secrets["firebase_api_key"]}, data=payload)
         try:
             data = r.json()
             user_info = {
@@ -59,6 +68,7 @@ def sign_in_with_email_and_password(email=None, password=None, return_secure_tok
     except Exception as e:
         st.warning(f'Signin failed: {e}')
 
+
 def reset_password(email):
     try:
         rest_api_url = "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode"
@@ -67,7 +77,7 @@ def reset_password(email):
             "requestType": "PASSWORD_RESET"
         }
         payload = json.dumps(payload)
-        r = requests.post(rest_api_url, params={"key": "AIzaSyALebezYE7_X1heM1sypIeAJmWI8QyModQ"}, data=payload)
+        r = requests.post(rest_api_url, params={"key": st.secrets["firebase_api_key"]}, data=payload)
         if r.status_code == 200:
             return True, "Reset email Sent"
         else:
@@ -77,6 +87,8 @@ def reset_password(email):
     except Exception as e:
         return False, str(e)
 
+
+# Authentication Page
 def authentication_page():
     st.title('Welcome to :violet[Craftify] :sunglasses:')
 
@@ -139,7 +151,7 @@ def authentication_page():
             st.l_rerun()
 
 
-
+# Main Page
 def main_page():
     st.set_page_config(layout="wide")
 
@@ -181,6 +193,6 @@ def main_page():
         st.write("Welcome to Craftify... Unleash the Power Within: Where Every Choice Shapes Your Fate")
         st.image("assets/logo/karn.jpg", use_column_width='auto')
 
+
 if __name__ == "__main__":
     main_page()
-
