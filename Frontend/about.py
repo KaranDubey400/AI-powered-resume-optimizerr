@@ -10,7 +10,7 @@ class About_section():
 
         # Key Features
         st.markdown("<h2 style='color:  #F05A7E;'>Key Features:</h2>", unsafe_allow_html=True)
-        st.markdown("<h3 style='color:  #F05A7E;'> Resume Analyzer (Resume Parser):</h3>", unsafe_allow_html=True)
+        st.markdown("<h3 style='color:  #F05A7E;'> Resume Analyzer </h3>", unsafe_allow_html=True)
         st.write("ATS Optimization: Users can scan their resumes against ATS systems to receive feedback and improve their chances of getting noticed by recruiters.")
         st.write("Resume Analysis: The platform provides semantic analysis and keyword extraction to ensure resumes highlight key skills and experiences.")
         st.write("Output Styling: Utilizes HTML and CSS to present extracted information in a user-friendly format.Includes tooltips and explanations for better user guidance.")
