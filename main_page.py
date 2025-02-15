@@ -185,7 +185,7 @@ def main_page():
             import streamlit_app  # Dynamically load the main app
             streamlit_app.main()
         else:
-            st.write("Welcome to Craftify... Unleash the Power Within: Where Every Choice Shapes Your Fate")
+            st.write("Welcome to Craftify...  Get Noticed, Get Hired!")
             st.image("assets/logo/karn.jpg", use_column_width='auto')
     else:
         # Display the main page content if no specific page is set
