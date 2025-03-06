@@ -189,7 +189,9 @@ def main_page():
             st.image("assets/logo/karn.jpg", use_column_width='auto')
     else:
         # Display the main page content if no specific page is set
-        st.write("Welcome to Craftify... Unleash the Power Within: Where Every Choice Shapes Your Fate")
+        # st.write("Understand Job Requirements. Tweak Your Resume. Shoot Your Shot!")
+        st.markdown("<h1 style='text-align: center; font-size: 60px; text-transform: uppercase;'>UNDERSTAND JOB REQUIREMENTS. TWEAK YOUR RESUME. SHOOT YOUR SHOT!</h1>", unsafe_allow_html=True)
+
         st.image("assets/logo/karn.jpg", use_column_width='auto')
 
 
