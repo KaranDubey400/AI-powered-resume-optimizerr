@@ -190,7 +190,7 @@ def main_page():
     else:
         # Display the main page content if no specific page is set
         # st.write("Understand Job Requirements. Tweak Your Resume. Shoot Your Shot!")
-        st.markdown("<h1 style='text-align: center; font-size: 60px; text-transform: uppercase;'>UNDERSTAND JOB REQUIREMENTS. TWEAK YOUR RESUME. SHOOT YOUR SHOT!</h1>", unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center; font-size: 50px; text-transform: uppercase;'>UNDERSTAND JOB REQUIREMENTS. TWEAK YOUR RESUME. APPLY!</h1>", unsafe_allow_html=True)
 
         st.image("assets/logo/karn.jpg", use_column_width='auto')
 
