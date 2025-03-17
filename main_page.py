@@ -194,7 +194,7 @@ if 'page' in st.session_state:
         else:
             st.write("Welcome to Craftify...  Get Noticed, Get Hired!")
             st.image("assets/logo/karn.jpg", use_column_width='auto')
-        else:
+        # else:
         # Display the main page content if no specific page is set
         # st.write("Understand Job Requirements. Tweak Your Resume. Shoot Your Shot!")
         st.markdown("<h1 style='text-align: center; font-size: 50px; text-transform: uppercase;'>UNDERSTAND JOB REQUIREMENTS. TWEAK YOUR RESUME. APPLY!</h1>", unsafe_allow_html=True)
