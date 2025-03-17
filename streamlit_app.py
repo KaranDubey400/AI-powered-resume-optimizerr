@@ -30,10 +30,8 @@ def main():
                                 icons=['house', 'folder', 'cloud', 'person', 'gear'],
                                 orientation="horizontal", manual_select=manual_select, key='menu_4')
     
-    if "sidebar_image_loaded" not in st.session_state:
-        st.session_state["sidebar_image_loaded"] = True
-      with st.sidebar:
-        st.image(image_path, use_column_width=True)
+    with st.sidebar:
+         st.image(image_path)
 
 
     if selected_main == "Home":
