@@ -22,7 +22,6 @@ if not firebase_admin._apps:
     cred = credentials.Certificate(firebase_config)
     firebase_admin.initialize_app(cred)
 
-
 # Sign-Up/Sign-In Functions
 def sign_up_with_email_and_password(email, password, username=None, return_secure_token=True):
     try:
@@ -42,7 +41,6 @@ def sign_up_with_email_and_password(email, password, username=None, return_secur
             st.warning(r.json())
     except Exception as e:
         st.warning(f'Signup failed: {e}')
-
 
 def sign_in_with_email_and_password(email=None, password=None, return_secure_token=True):
     rest_api_url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword"
@@ -68,7 +66,6 @@ def sign_in_with_email_and_password(email=None, password=None, return_secure_tok
     except Exception as e:
         st.warning(f'Signin failed: {e}')
 
-
 def reset_password(email):
     try:
         rest_api_url = "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode"
@@ -81,12 +78,10 @@ def reset_password(email):
         if r.status_code == 200:
             return True, "Reset email Sent"
         else:
-            # Handle error response
             error_message = r.json().get('error', {}).get('message')
             return False, error_message
     except Exception as e:
         return False, str(e)
-
 
 # Authentication Page
 def authentication_page():
@@ -103,6 +98,7 @@ def authentication_page():
             st.session_state.username = userinfo['username']
             st.session_state.useremail = userinfo['email']
             st.session_state.signedout = False
+            st.experimental_rerun()  # Use experimental_rerun for less aggressive reloads
         except:
             st.warning('Login Failed')
 
@@ -143,57 +139,52 @@ def authentication_page():
             st.session_state.signedout = True
             st.session_state.username = ''
             st.session_state.useremail = ''
-            st.rerun()
-
-        # Add a new button to go to the main app
+            st.experimental_rerun()
         if st.button('Go to the App →'):
             st.session_state['page'] = 'main_app'
-            st.rerun()
+            st.experimental_rerun()
+
+# Sidebar Rendering Function
+def render_sidebar():
+    with st.sidebar:
+        st.image("assets/logo/Colorlogo.png")
+        if 'username' in st.session_state and st.session_state['username']:
+            if st.button("Log Out || mainpage"):
+                st.session_state['username'] = ''
+                st.session_state['useremail'] = ''
+                st.session_state['page'] = 'authentication'
+                st.experimental_rerun()
+        else:
+            if st.button("main page"):
+                st.session_state['page'] = 'authentication'
+                st.experimental_rerun()
 
 # Main Page
 def main_page():
     st.set_page_config(layout="wide")
 
-    # Hide the Streamlit menu and footer
+    # Hide the Streamlit menu and footer with added CSS for sidebar stability
     hide_menu = """
         <style>
         #MainMenu {visibility:hidden;}
         footer {visibility:hidden;}
+        .css-1aumxhk {min-height: 100vh;} /* Force sidebar to full height */
         </style>
         """
     st.markdown(hide_menu, unsafe_allow_html=True)
 
-    # Sidebar with Sign Up and Sign Out buttons
-    with st.sidebar:
-        st.image("assets/logo/Colorlogo.png")
-
-        # Determine which button to show based on session state
-        if 'username' in st.session_state and st.session_state['username']:
-            if st.button("Log Out || mainpage"):
-                st.session_state['page'] = 'authentication'
-                st.rerun()
-        else:
-            if st.button("main page"):
-                st.session_state['page'] = 'authentication'
-                st.rerun()
+    # Render sidebar once
+    render_sidebar()
 
     # Main content display
-    if 'page' in st.session_state:
-        if st.session_state['page'] == 'authentication':
-            authentication_page()  # Render the authentication page
-        elif st.session_state['page'] == 'main_app':
-            import streamlit_app  # Dynamically load the main app
-            streamlit_app.main()
-        else:
-            st.write("Welcome to Craftify...  Get Noticed, Get Hired!")
-            st.image("assets/logo/karn.jpg", use_column_width='auto')
+    if 'page' not in st.session_state or st.session_state['page'] == 'authentication':
+        authentication_page()
+    elif st.session_state['page'] == 'main_app':
+        import streamlit_app
+        streamlit_app.main()
     else:
-        # Display the main page content if no specific page is set
-        # st.write("Understand Job Requirements. Tweak Your Resume. Shoot Your Shot!")
         st.markdown("<h1 style='text-align: center; font-size: 50px; text-transform: uppercase;'>UNDERSTAND JOB REQUIREMENTS. TWEAK YOUR RESUME. APPLY!</h1>", unsafe_allow_html=True)
-
         st.image("assets/logo/karn.jpg", use_column_width='auto')
-
 
 if __name__ == "__main__":
     main_page()
