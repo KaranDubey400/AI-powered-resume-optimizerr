@@ -148,7 +148,7 @@ def authentication_page():
         # Add a new button to go to the main app
         if st.button('Go to the App →'):
             st.session_state['page'] = 'main_app'
-           
+            st.rerun()
 
 # Main Page
 def main_page():
