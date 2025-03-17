@@ -185,7 +185,7 @@ with st.sidebar:
                 st.rerun()
 
     # Main content display
-    if 'page' in st.session_state:
+if 'page' in st.session_state:
         if st.session_state['page'] == 'authentication':
             authentication_page()  # Render the authentication page
         elif st.session_state['page'] == 'main_app':
