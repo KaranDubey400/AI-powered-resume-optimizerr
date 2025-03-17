@@ -41,6 +41,21 @@ with st.sidebar:
         if st.button("Login / Signup"):
             st.session_state['page'] = 'authentication'
             st.rerun()
+def sign_up_with_email_and_password(email, password, username=None, return_secure_token=True):
+    try:
+        rest_api_url = "https://identitytoolkit.googleapis.com/v1/accounts:signUp"
+        payload = {
+            "email": email,
+            "password": password,
+            "returnSecureToken": return_secure_token
+        }
+        if username:
+            payload["displayName"] = username
+        payload = json.dumps(payload)
+        r = requests.post(rest_api_url, params={"key": st.secrets["firebase_api_key"]}, data=payload)
+        return r.json().get('email', None)
+    except Exception as e:
+        st.warning(f'Signup failed: {e}')
 
 # Authentication Page
 def authentication_page():
