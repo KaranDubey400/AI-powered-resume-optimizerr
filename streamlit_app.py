@@ -7,8 +7,14 @@ from Frontend.instruction_page import Instruction as Ins
 from Frontend.ats_page import Ats_page as ats
 from Frontend.about import About_section as Ab_sec
 
-# File Path
-image_path = r"assets/logo/grey.png"
+# Set page config at the very top
+st.set_page_config(layout="wide")
+
+# Sidebar Image - Load Only Once
+if "sidebar_image_loaded" not in st.session_state:
+    st.session_state["sidebar_image_loaded"] = True
+    with st.sidebar:
+        st.image("assets/logo/grey.png", use_column_width=True)
 
 def main():
     # Hide the Streamlit menu and footer
@@ -29,10 +35,6 @@ def main():
     selected_main = option_menu(None, ["Home", "Instruction", "ATS Analyzer", "About"],
                                 icons=['house', 'folder', 'cloud', 'person', 'gear'],
                                 orientation="horizontal", manual_select=manual_select, key='menu_4')
-    
-    with st.sidebar:
-         st.image(image_path)
-
 
     if selected_main == "Home":
         HP.home_page()
@@ -74,7 +76,6 @@ def main():
     </div>
     """
     st.markdown(footer_html, unsafe_allow_html=True)
-
 
 if __name__ == "__main__":
     main()
