@@ -58,7 +58,7 @@ def sign_in_with_email_and_password(email=None, password=None, return_secure_tok
             data = r.json()
             user_info = {
                 'email': data['email'],
-                'username': data.get('displayName')  # Retrieve username if available
+                'username': data.get('displayName')
             }
             return user_info
         except:
@@ -98,7 +98,7 @@ def authentication_page():
             st.session_state.username = userinfo['username']
             st.session_state.useremail = userinfo['email']
             st.session_state.signedout = False
-            st.experimental_rerun()  # Use experimental_rerun for less aggressive reloads
+            st.experimental_rerun()
         except:
             st.warning('Login Failed')
 
@@ -144,18 +144,18 @@ def authentication_page():
             st.session_state['page'] = 'main_app'
             st.experimental_rerun()
 
-# Sidebar Rendering Function
+# Sidebar Rendering Function with Unique Keys
 def render_sidebar():
     with st.sidebar:
         st.image("assets/logo/Colorlogo.png")
         if 'username' in st.session_state and st.session_state['username']:
-            if st.button("Log Out || mainpage"):
+            if st.button("Log Out || mainpage", key="logout_mainpage_button"):
                 st.session_state['username'] = ''
                 st.session_state['useremail'] = ''
                 st.session_state['page'] = 'authentication'
                 st.experimental_rerun()
         else:
-            if st.button("main page"):
+            if st.button("main page", key="mainpage_button"):
                 st.session_state['page'] = 'authentication'
                 st.experimental_rerun()
 
