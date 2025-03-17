@@ -5,7 +5,7 @@ from firebase_admin import credentials
 import json
 import requests
 
-# Set page layout at the very beginning
+# Set page layout
 st.set_page_config(layout="wide")
 
 # Hide the Streamlit menu and footer
@@ -16,7 +16,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# Initialize Firebase only if it's not already initialized
+# Initialize Firebase only if not already initialized
 if not firebase_admin._apps:
     firebase_config = {
         "type": st.secrets["type"],
@@ -88,7 +88,7 @@ def main_page():
     if st.session_state['page'] == 'authentication':
         authentication_page()
     elif st.session_state['page'] == 'main_app':
-        import streamlit_app
+        import streamlit_app  # ✅ Ensure this import is done at runtime
         streamlit_app.main()
     else:
         st.markdown("<h1 style='text-align: center;'>UNDERSTAND JOB REQUIREMENTS. TWEAK YOUR RESUME. APPLY!</h1>", unsafe_allow_html=True)
