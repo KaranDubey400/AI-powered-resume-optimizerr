@@ -1,19 +1,168 @@
 import streamlit as st
 from streamlit_option_menu import option_menu
+import firebase_admin
+from firebase_admin import credentials
+import json
+import requests
 
-# From files
-from Frontend.home_page import home as HP
-from Frontend.instruction_page import Instruction as Ins
-from Frontend.ats_page import Ats_page as ats
-from Frontend.about import About_section as Ab_sec
+# Initialize Firebase only if it's not already initialized
+if not firebase_admin._apps:
+    firebase_config = {
+        "type": st.secrets["type"],
+        "project_id": st.secrets["project_id"],
+        "private_key_id": st.secrets["private_key_id"],
+        "private_key": st.secrets["private_key"],
+        "client_email": st.secrets["client_email"],
+        "client_id": st.secrets["client_id"],
+        "auth_uri": st.secrets["auth_uri"],
+        "token_uri": st.secrets["token_uri"],
+        "auth_provider_x509_cert_url": st.secrets["auth_provider_x509_cert_url"],
+        "client_x509_cert_url": st.secrets["client_x509_cert_url"]
+    }
+    cred = credentials.Certificate(firebase_config)
+    firebase_admin.initialize_app(cred)
 
-# File Path
-image_path = r"assets/logo/grey.png"
+# Sign-Up/Sign-In Functions
+def sign_up_with_email_and_password(email, password, username=None, return_secure_token=True):
+    try:
+        rest_api_url = "https://identitytoolkit.googleapis.com/v1/accounts:signUp"
+        payload = {
+            "email": email,
+            "password": password,
+            "returnSecureToken": return_secure_token
+        }
+        if username:
+            payload["displayName"] = username
+        payload = json.dumps(payload)
+        r = requests.post(rest_api_url, params={"key": st.secrets["firebase_api_key"]}, data=payload)
+        try:
+            return r.json()['email']
+        except:
+            st.warning(r.json())
+    except Exception as e:
+        st.warning(f'Signup failed: {e}')
 
-# Import render_sidebar from main_page
-from main_page import render_sidebar
+def sign_in_with_email_and_password(email=None, password=None, return_secure_token=True):
+    rest_api_url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword"
+    try:
+        payload = {
+            "returnSecureToken": return_secure_token
+        }
+        if email:
+            payload["email"] = email
+        if password:
+            payload["password"] = password
+        payload = json.dumps(payload)
+        r = requests.post(rest_api_url, params={"key": st.secrets["firebase_api_key"]}, data=payload)
+        try:
+            data = r.json()
+            user_info = {
+                'email': data['email'],
+                'username': data.get('displayName')
+            }
+            return user_info
+        except:
+            st.warning(data)
+    except Exception as e:
+        st.warning(f'Signin failed: {e}')
 
-def main():
+def reset_password(email):
+    try:
+        rest_api_url = "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode"
+        payload = {
+            "email": email,
+            "requestType": "PASSWORD_RESET"
+        }
+        payload = json.dumps(payload)
+        r = requests.post(rest_api_url, params={"key": st.secrets["firebase_api_key"]}, data=payload)
+        if r.status_code == 200:
+            return True, "Reset email Sent"
+        else:
+            error_message = r.json().get('error', {}).get('message')
+            return False, error_message
+    except Exception as e:
+        return False, str(e)
+
+# Authentication Page
+def authentication_page():
+    st.title('Welcome to :violet[Craftify] :sunglasses:')
+
+    if 'username' not in st.session_state:
+        st.session_state.username = ''
+    if 'useremail' not in st.session_state:
+        st.session_state.useremail = ''
+
+    def f():
+        try:
+            userinfo = sign_in_with_email_and_password(st.session_state.email_input, st.session_state.password_input)
+            st.session_state.username = userinfo['username']
+            st.session_state.useremail = userinfo['email']
+            st.session_state.signedout = False
+            st.experimental_rerun()
+        except:
+            st.warning('Login Failed')
+
+    def forget():
+        email = st.text_input('Email')
+        if st.button('Send Reset Link'):
+            success, message = reset_password(email)
+            if success:
+                st.success("Password reset email sent successfully.")
+            else:
+                st.warning(f"Password reset failed: {message}")
+
+    if "signedout" not in st.session_state:
+        st.session_state["signedout"] = True
+
+    if st.session_state["signedout"]:
+        choice = st.selectbox('Login/Signup', ['Login', 'Sign up'])
+        email = st.text_input('Email Address')
+        password = st.text_input('Password', type='password')
+        st.session_state.email_input = email
+        st.session_state.password_input = password
+
+        if choice == 'Sign up':
+            username = st.text_input("Enter your unique username")
+            if st.button('Create my account'):
+                sign_up_with_email_and_password(email=email, password=password, username=username)
+                st.success('Account created successfully!')
+                st.markdown('Please Login using your email and password')
+                st.balloons()
+        else:
+            st.button('Login', on_click=f)
+            forget()
+
+    else:
+        st.text('Name: ' + st.session_state.username)
+        st.text('Email id: ' + st.session_state.useremail)
+        if st.button('Sign out'):
+            st.session_state.signedout = True
+            st.session_state.username = ''
+            st.session_state.useremail = ''
+            st.experimental_rerun()
+        if st.button('Go to the App →'):
+            st.session_state['page'] = 'main_app'
+            st.experimental_rerun()
+
+# Sidebar Rendering Function with Unique Keys
+def render_sidebar():
+    with st.sidebar:
+        st.image("assets/logo/Colorlogo.png")
+        if 'username' in st.session_state and st.session_state['username']:
+            if st.button("Log Out || mainpage", key="logout_mainpage_button"):
+                st.session_state['username'] = ''
+                st.session_state['useremail'] = ''
+                st.session_state['page'] = 'authentication'
+                st.experimental_rerun()
+        else:
+            if st.button("main page", key="mainpage_button"):
+                st.session_state['page'] = 'authentication'
+                st.experimental_rerun()
+
+# Main Page
+def main_page():
+    st.set_page_config(layout="wide")
+
     # Hide the Streamlit menu and footer with added CSS for sidebar stability
     hide_menu = """
         <style>
@@ -27,60 +176,15 @@ def main():
     # Render sidebar once
     render_sidebar()
 
-    if st.session_state.get('switch_button', False):
-        st.session_state['menu_option'] = (st.session_state.get('menu_option', 0) + 1) % 5
-        manual_select = st.session_state['menu_option']
+    # Main content display
+    if 'page' not in st.session_state or st.session_state['page'] == 'authentication':
+        authentication_page()
+    elif st.session_state['page'] == 'main_app':
+        import streamlit_app
+        streamlit_app.main()
     else:
-        manual_select = None
-
-    selected_main = option_menu(None, ["Home", "Instruction", "ATS Analyzer", "About"],
-                                icons=['house', 'folder', 'cloud', 'person', 'gear'],
-                                orientation="horizontal", manual_select=manual_select, key='menu_4')
-    
-    # Sidebar image is now handled by render_sidebar, so this is redundant but kept for clarity
-    # with st.sidebar:
-    #     st.image(image_path)
-
-    if selected_main == "Home":
-        HP.home_page()
-    elif selected_main == "Instruction":
-        Ins.instruction()
-    elif selected_main == "ATS Analyzer":
-        ats.resume_parser()
-    elif selected_main == "About":
-        Ab_sec.About_Section()
-
-    # Create an empty space to center the button horizontally
-    col1, col2, col3 = st.columns([7, 5, 5])
-
-    # Place the button inside the middle column
-    with col2:
-        st.button(f"Next Page", key='switch_button')
-
-    # Footer note
-    footer_html = """
-    <style>
-        .footer {
-            position: fixed;
-            left: 0;
-            bottom: -9px;
-            width: 100%;
-            background-color: #C8A1E0;
-            display:flex;
-            flex-direction: column;
-            align-items:center;
-        }
-        .footer b {
-            color: #33372C;
-            font-size: 20px;
-        }
-    </style>
-    <div class="footer">
-        <b>Craftify</b>
-        <p>karn</p>
-    </div>
-    """
-    st.markdown(footer_html, unsafe_allow_html=True)
+        st.markdown("<h1 style='text-align: center; font-size: 50px; text-transform: uppercase;'>UNDERSTAND JOB REQUIREMENTS. TWEAK YOUR RESUME. APPLY!</h1>", unsafe_allow_html=True)
+        st.image("assets/logo/karn.jpg", use_column_width='auto')
 
 if __name__ == "__main__":
-    main()
+    main_page()
