@@ -163,11 +163,18 @@ def main_page():
         """
     st.markdown(hide_menu, unsafe_allow_html=True)
 
-    # Sidebar with Sign Up and Sign Out buttons
-    with st.sidebar:
-        st.image("assets/logo/Colorlogo.png")
+    # # Sidebar with Sign Up and Sign Out buttons
+    # with st.sidebar:
+    #     st.image("assets/logo/Colorlogo.png")
 
-        # Determine which button to show based on session state
+        
+# Sidebar Fix: Prevent Image from Reloading
+if "sidebar_image_loaded" not in st.session_state:
+    st.session_state["sidebar_image_loaded"] = True
+    with st.sidebar:
+        st.image("assets/logo/Colorlogo.png", use_column_width=True)
+
+with st.sidebar:
         if 'username' in st.session_state and st.session_state['username']:
             if st.button("Log Out || mainpage"):
                 st.session_state['page'] = 'authentication'
