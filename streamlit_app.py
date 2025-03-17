@@ -10,15 +10,22 @@ from Frontend.about import About_section as Ab_sec
 # File Path
 image_path = r"assets/logo/grey.png"
 
+# Import render_sidebar from main_page
+from main_page import render_sidebar
+
 def main():
-    # Hide the Streamlit menu and footer
+    # Hide the Streamlit menu and footer with added CSS for sidebar stability
     hide_menu = """
         <style>
         #MainMenu {visibility:hidden;}
         footer {visibility:hidden;}
+        .css-1aumxhk {min-height: 100vh;} /* Force sidebar to full height */
         </style>
         """
     st.markdown(hide_menu, unsafe_allow_html=True)
+
+    # Render sidebar once
+    render_sidebar()
 
     if st.session_state.get('switch_button', False):
         st.session_state['menu_option'] = (st.session_state.get('menu_option', 0) + 1) % 5
@@ -29,9 +36,10 @@ def main():
     selected_main = option_menu(None, ["Home", "Instruction", "ATS Analyzer", "About"],
                                 icons=['house', 'folder', 'cloud', 'person', 'gear'],
                                 orientation="horizontal", manual_select=manual_select, key='menu_4')
-
-    with st.sidebar:
-        st.image(image_path)
+    
+    # Sidebar image is now handled by render_sidebar, so this is redundant but kept for clarity
+    # with st.sidebar:
+    #     st.image(image_path)
 
     if selected_main == "Home":
         HP.home_page()
@@ -73,7 +81,6 @@ def main():
     </div>
     """
     st.markdown(footer_html, unsafe_allow_html=True)
-
 
 if __name__ == "__main__":
     main()
