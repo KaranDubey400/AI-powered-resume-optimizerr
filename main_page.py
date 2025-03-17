@@ -163,18 +163,11 @@ def main_page():
         """
     st.markdown(hide_menu, unsafe_allow_html=True)
 
-    # # Sidebar with Sign Up and Sign Out buttons
-    # with st.sidebar:
-    #     st.image("assets/logo/Colorlogo.png")
-
-        
-# Sidebar Fix: Prevent Image from Reloading
-if "sidebar_image_loaded" not in st.session_state:
-    st.session_state["sidebar_image_loaded"] = True
+    # Sidebar with Sign Up and Sign Out buttons
     with st.sidebar:
-        st.image("assets/logo/Colorlogo.png", use_column_width=True)
+        st.image("assets/logo/Colorlogo.png")
 
-with st.sidebar:
+        # Determine which button to show based on session state
         if 'username' in st.session_state and st.session_state['username']:
             if st.button("Log Out || mainpage"):
                 st.session_state['page'] = 'authentication'
@@ -185,7 +178,7 @@ with st.sidebar:
                 st.rerun()
 
     # Main content display
-if 'page' in st.session_state:
+    if 'page' in st.session_state:
         if st.session_state['page'] == 'authentication':
             authentication_page()  # Render the authentication page
         elif st.session_state['page'] == 'main_app':
@@ -194,7 +187,7 @@ if 'page' in st.session_state:
         else:
             st.write("Welcome to Craftify...  Get Noticed, Get Hired!")
             st.image("assets/logo/karn.jpg", use_column_width='auto')
-        # else:
+    else:
         # Display the main page content if no specific page is set
         # st.write("Understand Job Requirements. Tweak Your Resume. Shoot Your Shot!")
         st.markdown("<h1 style='text-align: center; font-size: 50px; text-transform: uppercase;'>UNDERSTAND JOB REQUIREMENTS. TWEAK YOUR RESUME. APPLY!</h1>", unsafe_allow_html=True)
