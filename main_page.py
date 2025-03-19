@@ -5,6 +5,9 @@ from firebase_admin import credentials
 import json
 import requests
 
+# ✅ Set the page configuration at the very top
+st.set_page_config(layout="wide")
+
 # Cache Firebase Initialization
 @st.cache_resource
 def initialize_firebase():
@@ -78,8 +81,6 @@ def authentication_page():
 # Main Page
 
 def main_page():
-    st.set_page_config(layout="wide")
-    
     with st.sidebar:
         st.image("assets/logo/Colorlogo.png")
         if 'username' in st.session_state and st.session_state['username']:
