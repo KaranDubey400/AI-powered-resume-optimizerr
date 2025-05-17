@@ -318,85 +318,94 @@ class Ats_page():
                         # RA.display_demo_progress_bar()
                         pass
                     if job_match:
-                        # Replace the demo circular progress bar with the actual progress bar
-                        st.markdown("<h1 style='color: #FF4B4B; padding-left:10px ; text-align: center;'> <font size='6'>Match Rate</font></h1>", unsafe_allow_html=True)
-                        progress_bar = st.sidebar.progress(0)
-                        for percent_complete in range(100):
-                            time.sleep(0.04)  # Add a delay to simulate processing time
-                            progress_bar.progress(percent_complete + 1)
-                        # Get the matching percentage
-                        match_percentage = RA.job_matching_algorithm(resume_text, job_description_text)
-                        # Determine the feedback based on the match percentage
-                        feedback = RA.job_matching_feedback(match_percentage)
-                        # Display the actual circular progress bar with the match percentage
-                        progress_bar_html = f"""
-                        <div class="result-container">
-                            <div class="heading">
-                            </div>
-                            <div class="percentage-container">
-                                <div class="percentage-circle"></div>
-                                <span>{match_percentage}%</span>
-                            </div>
-                            <h1>Match Rate</h1>
-                            <div class="highlighted-text">
-                                <div class="match-percentage">{match_percentage}%</div>
-                                <div class="feedback">{feedback}</div>
-                            </div>
-                        </div>
-                        <style>
-                            .result-container {
-                                display: flex;
-                                flex-direction: column;
-                                align-items: center;
-                                justify-content: center;
-                                margin: 20px auto;
-                                text-align: center;
-                                width: 100%;
-                            }
-                            .percentage-container {
-                                height: 200px;
-                                width: 200px;
-                                background-color: #0E1117;
-                                color: #FF4B4B;
-                                border-radius: 50%;
-                                display: flex;
-                                align-items: center;
-                                justify-content: center;
-                                position: relative;
-                                margin: 20px 0;
-                            }
-                            .percentage-circle {
-                                position: absolute;
-                                width: 100%;
-                                height: 100%;
-                                border: 4px solid #FF4B4B;
-                                border-radius: 50%;
-                            }
-                            .percentage-container span {
-                                font-size: 30px;
-                                font-weight: 400;
-                                z-index: 1;
-                            }
-                            .highlighted-text {
-                                background-color: rgba(61, 157, 243, 0.2);
-                                padding: 16px;
-                                border-radius: 5px;
-                                margin-top: 10px;
-                                width: 200px;
-                            }
-                            .match-percentage {
-                                font-weight: bold;
-                                color: #0aa859;
-                                font-size: 24px;
-                            }
-                            .feedback {
-                                font-size: 20px;
-                                color: rgb(199, 235, 255);
-                                margin-top: 10px;
-                            }
-                        </style>
-                        """
-                        st.sidebar.markdown(progress_bar_html, unsafe_allow_html=True)
+                        try:
+                            # Replace the demo circular progress bar with the actual progress bar
+                            st.markdown("<h1 style='color: #FF4B4B; padding-left:10px ; text-align: center;'> <font size='6'>Match Rate</font></h1>", unsafe_allow_html=True)
+                            progress_bar = st.sidebar.progress(0)
+                            for percent_complete in range(100):
+                                time.sleep(0.04)  # Add a delay to simulate processing time
+                                progress_bar.progress(percent_complete + 1)
+                            
+                            # Get the matching percentage
+                            match_percentage = RA.job_matching_algorithm(resume_text, job_description_text)
+                            
+                            if match_percentage is not None:
+                                # Determine the feedback based on the match percentage
+                                feedback = RA.job_matching_feedback(match_percentage)
+                                
+                                # Display the actual circular progress bar with the match percentage
+                                progress_bar_html = f"""
+                                <div class="result-container">
+                                    <div class="heading">
+                                    </div>
+                                    <div class="percentage-container">
+                                        <div class="percentage-circle"></div>
+                                        <span>{match_percentage}%</span>
+                                    </div>
+                                    <h1>Match Rate</h1>
+                                    <div class="highlighted-text">
+                                        <div class="match-percentage">{match_percentage}%</div>
+                                        <div class="feedback">{feedback}</div>
+                                    </div>
+                                </div>
+                                <style>
+                                    .result-container {{
+                                        display: flex;
+                                        flex-direction: column;
+                                        align-items: center;
+                                        justify-content: center;
+                                        margin: 20px auto;
+                                        text-align: center;
+                                        width: 100%;
+                                    }}
+                                    .percentage-container {{
+                                        height: 200px;
+                                        width: 200px;
+                                        background-color: #0E1117;
+                                        color: #FF4B4B;
+                                        border-radius: 50%;
+                                        display: flex;
+                                        align-items: center;
+                                        justify-content: center;
+                                        position: relative;
+                                        margin: 20px 0;
+                                    }}
+                                    .percentage-circle {{
+                                        position: absolute;
+                                        width: 100%;
+                                        height: 100%;
+                                        border: 4px solid #FF4B4B;
+                                        border-radius: 50%;
+                                    }}
+                                    .percentage-container span {{
+                                        font-size: 30px;
+                                        font-weight: 400;
+                                        z-index: 1;
+                                    }}
+                                    .highlighted-text {{
+                                        background-color: rgba(61, 157, 243, 0.2);
+                                        padding: 16px;
+                                        border-radius: 5px;
+                                        margin-top: 10px;
+                                        width: 200px;
+                                    }}
+                                    .match-percentage {{
+                                        font-weight: bold;
+                                        color: #0aa859;
+                                        font-size: 24px;
+                                    }}
+                                    .feedback {{
+                                        font-size: 20px;
+                                        color: rgb(199, 235, 255);
+                                        margin-top: 10px;
+                                    }}
+                                </style>
+                                """
+                                st.sidebar.markdown(progress_bar_html, unsafe_allow_html=True)
+                            else:
+                                st.warning("Could not calculate match percentage. Please check if both resume and job description contain sufficient text.")
+                        except Exception as e:
+                            st.error(f"Error calculating match percentage: {str(e)}")
         except Exception as e:
             # Handle any other unexpected errors
             st.error(f"Error: The file is missing or cannot be found")
