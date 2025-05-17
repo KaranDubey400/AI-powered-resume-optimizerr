@@ -322,29 +322,71 @@ class Ats_page():
                         feedback = RA.job_matching_feedback(match_percentage)
                         # Display the actual circular progress bar with the match percentage
                         progress_bar_html = f"""
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <br>
-                        <div class="result-container" style="margin: auto; width: 0%; text-align: center;">
+                        <div class="result-container">
                             <div class="heading">
                             </div>
                             <div class="percentage-container">
                                 <div class="percentage-circle"></div>
                                 <span>{match_percentage}%</span>
                             </div>
-                            <br>
-                            <div class="highlighted-text" style="width: 200px;">
-                                Match Percentage: <span class="match-percentage">{match_percentage}%</span><br>
-                           
+                            <h1>Match Rate</h1>
+                            <div class="highlighted-text">
+                                <div class="match-percentage">{match_percentage}%</div>
+                                <div class="feedback">{feedback}</div>
                             </div>
                         </div>
+                        <style>
+                            .result-container {
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                justify-content: center;
+                                margin: 20px auto;
+                                text-align: center;
+                                width: 100%;
+                            }
+                            .percentage-container {
+                                height: 200px;
+                                width: 200px;
+                                background-color: #0E1117;
+                                color: #FF4B4B;
+                                border-radius: 50%;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                position: relative;
+                                margin: 20px 0;
+                            }
+                            .percentage-circle {
+                                position: absolute;
+                                width: 100%;
+                                height: 100%;
+                                border: 4px solid #FF4B4B;
+                                border-radius: 50%;
+                            }
+                            .percentage-container span {
+                                font-size: 30px;
+                                font-weight: 400;
+                                z-index: 1;
+                            }
+                            .highlighted-text {
+                                background-color: rgba(61, 157, 243, 0.2);
+                                padding: 16px;
+                                border-radius: 5px;
+                                margin-top: 10px;
+                                width: 200px;
+                            }
+                            .match-percentage {
+                                font-weight: bold;
+                                color: #0aa859;
+                                font-size: 24px;
+                            }
+                            .feedback {
+                                font-size: 20px;
+                                color: rgb(199, 235, 255);
+                                margin-top: 10px;
+                            }
+                        </style>
                         """
                         st.sidebar.markdown(progress_bar_html, unsafe_allow_html=True)
         except Exception as e:
