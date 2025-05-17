@@ -39,6 +39,21 @@ def sign_in_with_email_and_password(email, password):
         return None, data['error']['message']
     return {'email': data['email'], 'username': data.get('displayName', '')}, None
 
+def sign_up_with_email_and_password(email, password, username):
+    rest_api_url = "https://identitytoolkit.googleapis.com/v1/accounts:signUp"
+    payload = json.dumps({
+        "email": email,
+        "password": password,
+        "displayName": username,
+        "returnSecureToken": True
+    })
+    r = requests.post(rest_api_url, params={"key": st.secrets["firebase_api_key"]}, data=payload)
+    data = r.json()
+    if 'error' in data:
+        st.error(f'Sign up failed: {data["error"]["message"]}')
+        return False
+    return True
+
 def authentication_page():
     st.title('Welcome to :violet[Craftify] :sunglasses:')
     
