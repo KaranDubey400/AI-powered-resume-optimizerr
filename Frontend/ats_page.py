@@ -319,15 +319,12 @@ class Ats_page():
                         pass
                     if job_match:
                         try:
-                            # Replace the demo circular progress bar with the actual progress bar
-                            st.markdown("<h1 style='color: #FF4B4B; padding-left:10px ; text-align: center;'> <font size='6'>Match Rate</font></h1>", unsafe_allow_html=True)
-                            
                             # Get the matching percentage first
                             match_percentage = RA.job_matching_algorithm(resume_text, job_description_text)
                             
                             if match_percentage is not None:
                                 # Show progress bar animation
-                                progress_bar = st.sidebar.progress(0)
+                                progress_bar = st.progress(0)
                                 for percent_complete in range(100):
                                     time.sleep(0.04)
                                     progress_bar.progress(percent_complete + 1)
@@ -336,13 +333,13 @@ class Ats_page():
                                 feedback = RA.job_matching_feedback(match_percentage)
                                 
                                 # Display the actual circular progress bar with the match percentage
+                                st.markdown("<h1 style='color: #FF4B4B; text-align: center;'>Match Rate Analysis</h1>", unsafe_allow_html=True)
                                 progress_bar_html = f"""
                                 <div class="result-container">
                                     <div class="percentage-container">
                                         <div class="percentage-circle"></div>
                                         <span>{match_percentage}%</span>
                                     </div>
-                                    <h1 style="color: #FF4B4B; margin: 10px 0;">Match Rate</h1>
                                     <div class="highlighted-text">
                                         <div class="match-percentage">{match_percentage}%</div>
                                         <div class="feedback">{feedback}</div>
@@ -403,7 +400,7 @@ class Ats_page():
                                     }}
                                 </style>
                                 """
-                                st.sidebar.markdown(progress_bar_html, unsafe_allow_html=True)
+                                st.markdown(progress_bar_html, unsafe_allow_html=True)
                             else:
                                 st.warning("Could not calculate match percentage. Please check if both resume and job description contain sufficient text.")
                         except Exception as e:
