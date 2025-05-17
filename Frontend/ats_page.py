@@ -116,6 +116,98 @@ class Ats_page():
                 styled_skills_paragraph = f"<p>{html_name}</p>"
                 st.markdown(styled_skills_paragraph, unsafe_allow_html=True)
                 
+                # Add Match Rate Analysis here
+                if job_match:
+                    try:
+                        # Get the matching percentage first
+                        match_percentage = RA.job_matching_algorithm(resume_text, job_description_text)
+                        
+                        if match_percentage is not None:
+                            # Show progress bar animation
+                            progress_bar = st.progress(0)
+                            for percent_complete in range(100):
+                                time.sleep(0.04)
+                                progress_bar.progress(percent_complete + 1)
+                            
+                            # Determine the feedback based on the match percentage
+                            feedback = RA.job_matching_feedback(match_percentage)
+                            
+                            # Display the actual circular progress bar with the match percentage
+                            st.markdown("<h1 style='color: #FF4B4B; text-align: center;'>Match Rate Analysis</h1>", unsafe_allow_html=True)
+                            progress_bar_html = f"""
+                            <div class="result-container">
+                                <div class="percentage-container">
+                                    <div class="percentage-circle"></div>
+                                    <span>{match_percentage}%</span>
+                                </div>
+                                <div class="highlighted-text">
+                                    <div class="match-percentage">{match_percentage}%</div>
+                                    <div class="feedback">{feedback}</div>
+                                </div>
+                            </div>
+                            <style>
+                                .result-container {{
+                                    display: flex;
+                                    flex-direction: column;
+                                    align-items: center;
+                                    justify-content: center;
+                                    margin: 0 auto;
+                                    text-align: center;
+                                    width: 100%;
+                                    padding: 20px;
+                                }}
+                                .percentage-container {{
+                                    height: 180px;
+                                    width: 180px;
+                                    background-color: #0E1117;
+                                    color: #FF4B4B;
+                                    border-radius: 50%;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    position: relative;
+                                    margin: 10px auto;
+                                }}
+                                .percentage-circle {{
+                                    position: absolute;
+                                    width: 100%;
+                                    height: 100%;
+                                    border: 4px solid #FF4B4B;
+                                    border-radius: 50%;
+                                }}
+                                .percentage-container span {{
+                                    font-size: 36px;
+                                    font-weight: 600;
+                                    z-index: 1;
+                                }}
+                                .highlighted-text {{
+                                    background-color: rgba(61, 157, 243, 0.2);
+                                    padding: 15px;
+                                    border-radius: 8px;
+                                    margin-top: 15px;
+                                    width: 180px;
+                                    margin: 15px auto;
+                                }}
+                                .match-percentage {{
+                                    font-weight: bold;
+                                    color: #0aa859;
+                                    font-size: 24px;
+                                    margin-bottom: 5px;
+                                }}
+                                .feedback {{
+                                    font-size: 18px;
+                                    color: rgb(199, 235, 255);
+                                    margin-top: 5px;
+                                }}
+                            </style>
+                            """
+                            st.markdown(progress_bar_html, unsafe_allow_html=True)
+                        else:
+                            st.warning("Could not calculate match percentage. Please check if both resume and job description contain sufficient text.")
+                    except Exception as e:
+                        st.error(f"Error calculating match percentage: {str(e)}")
+                        st.error("Please make sure both resume and job description are properly uploaded and contain text content.")
+                
                 # Extract skills from user resume
                 user_skills = RA.unique_skills(RA.extract_skills(RA.clean_text(user_resume),nlp))
                 # Display user skills
