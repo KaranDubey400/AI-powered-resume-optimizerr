@@ -30,16 +30,20 @@ class Ats_page():
             user_resume = st.file_uploader("📄 Upload Your Resume (in .docx format)", type=["docx"])
             # If resume is uploaded, convert content to text
             if user_resume is not None:
-                user_resume = RA.extract_text_from_word_document(user_resume) if user_resume.name.endswith('.docx') else None
-                # Display success or error message based on file upload
-                if user_resume is not None:
-                    st.success("🎉 Resume uploaded successfully!")
-                else:
-                    st.error("❌ Please upload a .docx file.")
-                if st.button("Show Resume"):
+                try:
+                    user_resume = RA.extract_text_from_word_document(user_resume) if user_resume.name.endswith('.docx') else None
+                    # Display success or error message based on file upload
                     if user_resume is not None:
-                        st.subheader("Resume Text:")
-                        st.text(user_resume)
+                        st.success("🎉 Resume uploaded successfully!")
+                    else:
+                        st.error("❌ Please upload a .docx file.")
+                    if st.button("Show Resume"):
+                        if user_resume is not None:
+                            st.subheader("Resume Text:")
+                            st.text(user_resume)
+                except Exception as e:
+                    st.error(f"Error processing resume: {str(e)}")
+                    user_resume = None
             st.markdown("<br>", unsafe_allow_html=True)
             # Checkbox to let the user choose the input method for Job Description
             use_file_for_job_description = st.checkbox("📄 Upload Job Description from file")
@@ -47,15 +51,19 @@ class Ats_page():
             if use_file_for_job_description:
                 job_description = st.file_uploader("Upload job description file (in .docx format)", type=["docx"])
                 if job_description is not None:
-                    job_description = RA.extract_text_from_word_document(job_description) if job_description.name.endswith('.docx') else None
-                    if job_description is not None:
-                        st.success("🎉 job_description uploaded successfully!")
-                    else:
-                        st.error("❌ Please upload a .docx file.")
-                    if st.button("Show Job"):
-                        if user_resume is not None:
-                            st.subheader("Job Description:")
-                            st.text(job_description)
+                    try:
+                        job_description = RA.extract_text_from_word_document(job_description) if job_description.name.endswith('.docx') else None
+                        if job_description is not None:
+                            st.success("🎉 job_description uploaded successfully!")
+                        else:
+                            st.error("❌ Please upload a .docx file.")
+                        if st.button("Show Job"):
+                            if job_description is not None:
+                                st.subheader("Job Description:")
+                                st.text(job_description)
+                    except Exception as e:
+                        st.error(f"Error processing job description: {str(e)}")
+                        job_description = None
             else:
                 job_description = st.text_area("✍️ Paste job description here ⬇️")
                 if job_description:
