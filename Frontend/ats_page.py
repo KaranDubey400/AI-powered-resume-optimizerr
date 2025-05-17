@@ -133,16 +133,18 @@ class Ats_page():
                             feedback = RA.job_matching_feedback(match_percentage)
                             
                             # Display the actual circular progress bar with the match percentage
-                            st.markdown("<h1 style='color: #FF4B4B; text-align: center;'>Match Rate Analysis</h1>", unsafe_allow_html=True)
+                            st.markdown("<h1 style='color: #FF4B4B; text-align: center; margin-bottom: 20px;'>Match Rate Analysis</h1>", unsafe_allow_html=True)
                             progress_bar_html = f"""
-                            <div class="result-container">
-                                <div class="percentage-container">
-                                    <div class="percentage-circle"></div>
-                                    <span>{match_percentage}%</span>
-                                </div>
-                                <div class="highlighted-text">
-                                    <div class="match-percentage">{match_percentage}%</div>
-                                    <div class="feedback">{feedback}</div>
+                            <div style="display: flex; justify-content: center; width: 100%;">
+                                <div class="result-container">
+                                    <div class="percentage-container">
+                                        <div class="percentage-circle"></div>
+                                        <span>{match_percentage}%</span>
+                                    </div>
+                                    <div class="highlighted-text">
+                                        <div class="match-percentage">{match_percentage}%</div>
+                                        <div class="feedback">{feedback}</div>
+                                    </div>
                                 </div>
                             </div>
                             <style>
@@ -151,10 +153,10 @@ class Ats_page():
                                     flex-direction: column;
                                     align-items: center;
                                     justify-content: center;
-                                    margin: 0 auto;
                                     text-align: center;
-                                    width: 100%;
+                                    width: fit-content;
                                     padding: 20px;
+                                    margin: 0 auto;
                                 }}
                                 .percentage-container {{
                                     height: 180px;
@@ -166,7 +168,7 @@ class Ats_page():
                                     align-items: center;
                                     justify-content: center;
                                     position: relative;
-                                    margin: 10px auto;
+                                    margin: 0 auto 20px auto;
                                 }}
                                 .percentage-circle {{
                                     position: absolute;
@@ -184,9 +186,8 @@ class Ats_page():
                                     background-color: rgba(61, 157, 243, 0.2);
                                     padding: 15px;
                                     border-radius: 8px;
-                                    margin-top: 15px;
                                     width: 180px;
-                                    margin: 15px auto;
+                                    margin: 0 auto;
                                 }}
                                 .match-percentage {{
                                     font-weight: bold;
@@ -429,16 +430,18 @@ class Ats_page():
                                 
                                 with col2:
                                     # Display the actual circular progress bar with the match percentage
-                                    st.markdown("<h1 style='color: #FF4B4B; text-align: center;'>Match Rate Analysis</h1>", unsafe_allow_html=True)
+                                    st.markdown("<h1 style='color: #FF4B4B; text-align: center; margin-bottom: 20px;'>Match Rate Analysis</h1>", unsafe_allow_html=True)
                                     progress_bar_html = f"""
-                                    <div class="result-container">
-                                        <div class="percentage-container">
-                                            <div class="percentage-circle"></div>
-                                            <span>{match_percentage}%</span>
-                                        </div>
-                                        <div class="highlighted-text">
-                                            <div class="match-percentage">{match_percentage}%</div>
-                                            <div class="feedback">{feedback}</div>
+                                    <div style="display: flex; justify-content: center; width: 100%;">
+                                        <div class="result-container">
+                                            <div class="percentage-container">
+                                                <div class="percentage-circle"></div>
+                                                <span>{match_percentage}%</span>
+                                            </div>
+                                            <div class="highlighted-text">
+                                                <div class="match-percentage">{match_percentage}%</div>
+                                                <div class="feedback">{feedback}</div>
+                                            </div>
                                         </div>
                                     </div>
                                     <style>
@@ -447,10 +450,10 @@ class Ats_page():
                                             flex-direction: column;
                                             align-items: center;
                                             justify-content: center;
-                                            margin: 0 auto;
                                             text-align: center;
-                                            width: 100%;
+                                            width: fit-content;
                                             padding: 20px;
+                                            margin: 0 auto;
                                         }}
                                         .percentage-container {{
                                             height: 180px;
@@ -462,7 +465,7 @@ class Ats_page():
                                             align-items: center;
                                             justify-content: center;
                                             position: relative;
-                                            margin: 10px auto;
+                                            margin: 0 auto 20px auto;
                                         }}
                                         .percentage-circle {{
                                             position: absolute;
@@ -480,9 +483,8 @@ class Ats_page():
                                             background-color: rgba(61, 157, 243, 0.2);
                                             padding: 15px;
                                             border-radius: 8px;
-                                            margin-top: 15px;
                                             width: 180px;
-                                            margin: 15px auto;
+                                            margin: 0 auto;
                                         }}
                                         .match-percentage {{
                                             font-weight: bold;
