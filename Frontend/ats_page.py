@@ -321,23 +321,23 @@ class Ats_page():
                         try:
                             # Replace the demo circular progress bar with the actual progress bar
                             st.markdown("<h1 style='color: #FF4B4B; padding-left:10px ; text-align: center;'> <font size='6'>Match Rate</font></h1>", unsafe_allow_html=True)
-                            progress_bar = st.sidebar.progress(0)
-                            for percent_complete in range(100):
-                                time.sleep(0.04)  # Add a delay to simulate processing time
-                                progress_bar.progress(percent_complete + 1)
                             
-                            # Get the matching percentage
+                            # Get the matching percentage first
                             match_percentage = RA.job_matching_algorithm(resume_text, job_description_text)
                             
                             if match_percentage is not None:
+                                # Show progress bar animation
+                                progress_bar = st.sidebar.progress(0)
+                                for percent_complete in range(100):
+                                    time.sleep(0.04)
+                                    progress_bar.progress(percent_complete + 1)
+                                
                                 # Determine the feedback based on the match percentage
                                 feedback = RA.job_matching_feedback(match_percentage)
                                 
                                 # Display the actual circular progress bar with the match percentage
                                 progress_bar_html = f"""
                                 <div class="result-container">
-                                    <div class="heading">
-                                    </div>
                                     <div class="percentage-container">
                                         <div class="percentage-circle"></div>
                                         <span>{match_percentage}%</span>
@@ -408,6 +408,7 @@ class Ats_page():
                                 st.warning("Could not calculate match percentage. Please check if both resume and job description contain sufficient text.")
                         except Exception as e:
                             st.error(f"Error calculating match percentage: {str(e)}")
+                            st.error("Please make sure both resume and job description are properly uploaded and contain text content.")
         except Exception as e:
-            # Handle any other unexpected errors
-            st.error(f"Error: The file is missing or cannot be found")
+            st.error(f"Error processing files: {str(e)}")
+            st.error("Please check if the files are in correct format and try again.")
