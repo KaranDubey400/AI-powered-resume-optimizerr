@@ -159,21 +159,30 @@ def authentication_page():
                     st.error('Please fill all fields!')
                 elif len(password) < 6:
                     st.warning('Password must be at least 6 characters.')
+                elif '@' not in email or '.' not in email:
+                    st.warning('Please enter a valid email address.')
                 else:
-                    success, error = sign_up_with_email_and_password(email, password, username)
+                    with st.spinner('Creating your account...'):
+                        success, error = sign_up_with_email_and_password(email, password, username)
                     if success:
                         st.success('Account created successfully! Please login.')
                         st.balloons()
                         st.experimental_set_query_params(auth='login')
                     else:
-                        st.error(f'Sign up failed: {error}')
+                        if error == 'EMAIL_EXISTS':
+                            st.error('This email is already registered. Please login or use another email.')
+                        elif error == 'WEAK_PASSWORD : Password should be at least 6 characters':
+                            st.error('Password is too weak. Please use at least 6 characters.')
+                        else:
+                            st.error(f'Sign up failed: {error}')
         elif hash_route == 'reset':
             reset_btn, email = reset_form()
             if reset_btn:
                 if not email:
                     st.error('Please enter your email!')
                 else:
-                    success, error = send_password_reset_email(email)
+                    with st.spinner('Sending reset email...'):
+                        success, error = send_password_reset_email(email)
                     if success:
                         st.success('Password reset email sent! Check your inbox.')
                     else:
@@ -184,9 +193,17 @@ def authentication_page():
                 if not email or not password:
                     st.error('Please enter both email and password!')
                 else:
-                    user_info, error = sign_in_with_email_and_password(email, password)
+                    with st.spinner('Logging you in...'):
+                        user_info, error = sign_in_with_email_and_password(email, password)
                     if error:
-                        st.warning(f'Login Failed: {error}')
+                        if error == 'EMAIL_NOT_FOUND':
+                            st.error('No account found with this email. Please sign up first.')
+                        elif error == 'INVALID_PASSWORD':
+                            st.error('Incorrect password. Please try again.')
+                        elif error == 'USER_DISABLED':
+                            st.error('This user account has been disabled.')
+                        else:
+                            st.warning(f'Login Failed: {error}')
                     else:
                         st.session_state['username'] = user_info['username']
                         st.session_state['useremail'] = user_info['email']
