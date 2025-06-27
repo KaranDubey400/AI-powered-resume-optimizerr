@@ -115,11 +115,11 @@ def login_form():
     with col1:
         login_btn = st.button('Login', use_container_width=True)
     with col2:
-        st.markdown('<span class="auth-link" onclick="window.location.hash=\'reset\'">Forgot Password?</span>', unsafe_allow_html=True)
+        forgot = st.button('Forgot Password?', use_container_width=True, key='forgot_btn')
     st.markdown('<br>', unsafe_allow_html=True)
-    st.markdown('<span class="auth-link" onclick="window.location.hash=\'signup\'">New user? Sign up</span>', unsafe_allow_html=True)
+    signup = st.button('New user? Sign up', use_container_width=True, key='signup_btn')
     card_close()
-    return login_btn, email, password
+    return login_btn, email, password, forgot, signup
 
 def signup_form():
     card_container()
@@ -129,9 +129,9 @@ def signup_form():
     username = st.text_input('Username', key='signup_username')
     signup_btn = st.button('Create Account', use_container_width=True)
     st.markdown('<br>', unsafe_allow_html=True)
-    st.markdown('<span class="auth-link" onclick="window.location.hash=\'login\'">Already have an account? Login</span>', unsafe_allow_html=True)
+    login = st.button('Already have an account? Login', use_container_width=True, key='login_btn')
     card_close()
-    return signup_btn, email, password, username
+    return signup_btn, email, password, username, login
 
 def reset_form():
     card_container()
@@ -139,21 +139,24 @@ def reset_form():
     email = st.text_input('Enter your email address', key='reset_email')
     reset_btn = st.button('Send Reset Email', use_container_width=True)
     st.markdown('<br>', unsafe_allow_html=True)
-    st.markdown('<span class="auth-link" onclick="window.location.hash=\'login\'">Back to Login</span>', unsafe_allow_html=True)
+    back = st.button('Back to Login', use_container_width=True, key='back_login_btn')
     card_close()
-    return reset_btn, email
+    return reset_btn, email, back
 
 # --- Main Auth Page ---
 def authentication_page():
     st.image("assets/logo/Colorlogo.png", width=120)
     st.markdown("<h2 style='text-align:center; color:#6C63FF;'>Welcome to <b>Craftify</b> :sunglasses:</h2>", unsafe_allow_html=True)
-    # Routing based on hash
+    # Routing based on query param
     hash_route = st.experimental_get_query_params().get('auth', ['login'])[0]
     if 'signedout' not in st.session_state:
         st.session_state['signedout'] = True
     if st.session_state['signedout']:
         if hash_route == 'signup':
-            signup_btn, email, password, username = signup_form()
+            signup_btn, email, password, username, login = signup_form()
+            if login:
+                st.experimental_set_query_params(auth='login')
+                st.experimental_rerun()
             if signup_btn:
                 if not email or not password or not username:
                     st.error('Please fill all fields!')
@@ -168,6 +171,7 @@ def authentication_page():
                         st.success('Account created successfully! Please login.')
                         st.balloons()
                         st.experimental_set_query_params(auth='login')
+                        st.experimental_rerun()
                     else:
                         if error == 'EMAIL_EXISTS':
                             st.error('This email is already registered. Please login or use another email.')
@@ -176,7 +180,10 @@ def authentication_page():
                         else:
                             st.error(f'Sign up failed: {error}')
         elif hash_route == 'reset':
-            reset_btn, email = reset_form()
+            reset_btn, email, back = reset_form()
+            if back:
+                st.experimental_set_query_params(auth='login')
+                st.experimental_rerun()
             if reset_btn:
                 if not email:
                     st.error('Please enter your email!')
@@ -188,7 +195,13 @@ def authentication_page():
                     else:
                         st.error(f'Error: {error}')
         else:  # login
-            login_btn, email, password = login_form()
+            login_btn, email, password, forgot, signup = login_form()
+            if forgot:
+                st.experimental_set_query_params(auth='reset')
+                st.experimental_rerun()
+            if signup:
+                st.experimental_set_query_params(auth='signup')
+                st.experimental_rerun()
             if login_btn:
                 if not email or not password:
                     st.error('Please enter both email and password!')
@@ -210,12 +223,14 @@ def authentication_page():
                         st.session_state['signedout'] = False
                         st.success('Login successful!')
                         st.experimental_set_query_params(page='main_app')
+                        st.experimental_rerun()
     else:
         st.markdown(f'<div class="auth-card"><b>Name:</b> {st.session_state.username}<br><b>Email:</b> {st.session_state.useremail}</div>', unsafe_allow_html=True)
         if st.button('Sign out', use_container_width=True):
             st.session_state.clear()
             st.session_state['signedout'] = True
             st.experimental_set_query_params(auth='login')
+            st.experimental_rerun()
         if st.button('Go to the App →', use_container_width=True):
             st.experimental_set_query_params(page='main_app')
             st.session_state['page'] = 'main_app'
