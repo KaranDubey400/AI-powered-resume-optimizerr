@@ -29,8 +29,7 @@ def initialize_firebase():
 if not firebase_admin._apps:
     initialize_firebase()
 
-# --- Firebase Auth REST API Functions ---
-
+# Sign-In and Sign-Up Functions (Optimized Error Handling)
 def sign_in_with_email_and_password(email, password):
     rest_api_url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword"
     payload = json.dumps({"email": email, "password": password, "returnSecureToken": True})
@@ -51,187 +50,46 @@ def sign_up_with_email_and_password(email, password, username):
     r = requests.post(rest_api_url, params={"key": st.secrets["firebase_api_key"]}, data=payload)
     data = r.json()
     if 'error' in data:
-        return False, data["error"]["message"]
-    return True, None
+        st.error(f'Sign up failed: {data["error"]["message"]}')
+        return False
+    return True
 
-def send_password_reset_email(email):
-    rest_api_url = "https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode"
-    payload = json.dumps({
-        "requestType": "PASSWORD_RESET",
-        "email": email
-    })
-    r = requests.post(rest_api_url, params={"key": st.secrets["firebase_api_key"]}, data=payload)
-    data = r.json()
-    if 'error' in data:
-        return False, data['error']['message']
-    return True, None
-
-# --- UI Components ---
-
-def card_container():
-    st.markdown(
-        """
-        <style>
-        .auth-card {
-            background: #fff;
-            border-radius: 16px;
-            box-shadow: 0 4px 24px rgba(0,0,0,0.10);
-            padding: 2.5rem 2rem 2rem 2rem;
-            max-width: 400px;
-            margin: 3rem auto 2rem auto;
-        }
-        .auth-title {
-            text-align: center;
-            font-size: 2rem;
-            font-weight: bold;
-            color: #6C63FF;
-            margin-bottom: 1.5rem;
-        }
-        .auth-link {
-            color: #6C63FF;
-            text-decoration: underline;
-            cursor: pointer;
-        }
-        .auth-link:hover {
-            color: #4834d4;
-        }
-        </style>
-        <div class="auth-card">
-        """,
-        unsafe_allow_html=True
-    )
-
-def card_close():
-    st.markdown("</div>", unsafe_allow_html=True)
-
-# --- Auth Forms ---
-
-def login_form():
-    card_container()
-    st.markdown('<div class="auth-title">Login</div>', unsafe_allow_html=True)
-    email = st.text_input('Email Address', key='login_email')
-    password = st.text_input('Password', type='password', key='login_password')
-    col1, col2 = st.columns([1, 1])
-    with col1:
-        login_btn = st.button('Login', use_container_width=True)
-    with col2:
-        forgot = st.button('Forgot Password?', use_container_width=True, key='forgot_btn')
-    st.markdown('<br>', unsafe_allow_html=True)
-    signup = st.button('New user? Sign up', use_container_width=True, key='signup_btn')
-    card_close()
-    return login_btn, email, password, forgot, signup
-
-def signup_form():
-    card_container()
-    st.markdown('<div class="auth-title">Sign Up</div>', unsafe_allow_html=True)
-    email = st.text_input('Email Address', key='signup_email')
-    password = st.text_input('Password', type='password', key='signup_password')
-    username = st.text_input('Username', key='signup_username')
-    signup_btn = st.button('Create Account', use_container_width=True)
-    st.markdown('<br>', unsafe_allow_html=True)
-    login = st.button('Already have an account? Login', use_container_width=True, key='login_btn')
-    card_close()
-    return signup_btn, email, password, username, login
-
-def reset_form():
-    card_container()
-    st.markdown('<div class="auth-title">Reset Password</div>', unsafe_allow_html=True)
-    email = st.text_input('Enter your email address', key='reset_email')
-    reset_btn = st.button('Send Reset Email', use_container_width=True)
-    st.markdown('<br>', unsafe_allow_html=True)
-    back = st.button('Back to Login', use_container_width=True, key='back_login_btn')
-    card_close()
-    return reset_btn, email, back
-
-# --- Main Auth Page ---
 def authentication_page():
-    st.image("assets/logo/Colorlogo.png", width=120)
-    st.markdown("<h2 style='text-align:center; color:#6C63FF;'>Welcome to <b>Craftify</b> :sunglasses:</h2>", unsafe_allow_html=True)
-    # Routing based on query param
-    hash_route = st.experimental_get_query_params().get('auth', ['login'])[0]
+    st.title('Welcome to :violet[Craftify] :sunglasses:')
+    
     if 'signedout' not in st.session_state:
         st.session_state['signedout'] = True
+    
     if st.session_state['signedout']:
-        if hash_route == 'signup':
-            signup_btn, email, password, username, login = signup_form()
-            if login:
-                st.experimental_set_query_params(auth='login')
-                st.experimental_rerun()
-            if signup_btn:
-                if not email or not password or not username:
-                    st.error('Please fill all fields!')
-                elif len(password) < 6:
-                    st.warning('Password must be at least 6 characters.')
-                elif '@' not in email or '.' not in email:
-                    st.warning('Please enter a valid email address.')
+        choice = st.selectbox('Login/Signup', ['Login', 'Sign up'])
+        email = st.text_input('Email Address', key='email_input')
+        password = st.text_input('Password', type='password', key='password_input')
+        
+        if choice == 'Sign up':
+            username = st.text_input("Enter your unique username")
+            if st.button('Create my account'):
+                sign_up_with_email_and_password(email, password, username)
+                st.success('Account created successfully!')
+                st.markdown('Please Login using your email and password')
+                st.balloons()
+        else:
+            if st.button('Login'):
+                user_info, error = sign_in_with_email_and_password(email, password)
+                if error:
+                    st.warning(f'Login Failed: {error}')
                 else:
-                    with st.spinner('Creating your account...'):
-                        success, error = sign_up_with_email_and_password(email, password, username)
-                    if success:
-                        st.success('Account created successfully! Please login.')
-                        st.balloons()
-                        st.experimental_set_query_params(auth='login')
-                        st.experimental_rerun()
-                    else:
-                        if error == 'EMAIL_EXISTS':
-                            st.error('This email is already registered. Please login or use another email.')
-                        elif error == 'WEAK_PASSWORD : Password should be at least 6 characters':
-                            st.error('Password is too weak. Please use at least 6 characters.')
-                        else:
-                            st.error(f'Sign up failed: {error}')
-        elif hash_route == 'reset':
-            reset_btn, email, back = reset_form()
-            if back:
-                st.experimental_set_query_params(auth='login')
-                st.experimental_rerun()
-            if reset_btn:
-                if not email:
-                    st.error('Please enter your email!')
-                else:
-                    with st.spinner('Sending reset email...'):
-                        success, error = send_password_reset_email(email)
-                    if success:
-                        st.success('Password reset email sent! Check your inbox.')
-                    else:
-                        st.error(f'Error: {error}')
-        else:  # login
-            login_btn, email, password, forgot, signup = login_form()
-            if forgot:
-                st.experimental_set_query_params(auth='reset')
-                st.experimental_rerun()
-            if signup:
-                st.experimental_set_query_params(auth='signup')
-                st.experimental_rerun()
-            if login_btn:
-                if not email or not password:
-                    st.error('Please enter both email and password!')
-                else:
-                    with st.spinner('Logging you in...'):
-                        user_info, error = sign_in_with_email_and_password(email, password)
-                    if error:
-                        if error == 'EMAIL_NOT_FOUND':
-                            st.error('No account found with this email. Please sign up first.')
-                        elif error == 'INVALID_PASSWORD':
-                            st.error('Incorrect password. Please try again.')
-                        elif error == 'USER_DISABLED':
-                            st.error('This user account has been disabled.')
-                        else:
-                            st.warning(f'Login Failed: {error}')
-                    else:
-                        st.session_state['username'] = user_info['username']
-                        st.session_state['useremail'] = user_info['email']
-                        st.session_state['signedout'] = False
-                        st.success('Login successful!')
-                        st.experimental_set_query_params(page='main_app')
-                        st.experimental_rerun()
+                    st.session_state['username'] = user_info['username']
+                    st.session_state['useremail'] = user_info['email']
+                    st.session_state['signedout'] = False
     else:
-        st.markdown(f'<div class="auth-card"><b>Name:</b> {st.session_state.username}<br><b>Email:</b> {st.session_state.useremail}</div>', unsafe_allow_html=True)
-        if st.button('Sign out', use_container_width=True):
+        st.text(f'Name: {st.session_state.username}')
+        st.text(f'Email: {st.session_state.useremail}')
+        
+        if st.button('Sign out'):
             st.session_state.clear()
             st.session_state['signedout'] = True
-            st.experimental_set_query_params(auth='login')
-            st.experimental_rerun()
-        if st.button('Go to the App →', use_container_width=True):
+        
+        if st.button('Go to the App →'):
             st.experimental_set_query_params(page='main_app')
             st.session_state['page'] = 'main_app'
 
@@ -247,8 +105,10 @@ def main_page():
         else:
             if st.button("Go to Authentication"):
                 st.experimental_set_query_params(page='authentication')
+    
     query_params = st.experimental_get_query_params()
     current_page = query_params.get("page", ["main"])[0]
+    
     if current_page == 'authentication':
         authentication_page()
     elif current_page == 'main_app':
@@ -260,4 +120,3 @@ def main_page():
 
 if __name__ == "__main__":
     main_page()
-
