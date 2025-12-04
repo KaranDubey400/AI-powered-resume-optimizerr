@@ -1,4 +1,4 @@
-# AI-powered-resume-optimizer by karn  
+# Craftify
 tt is an AI-powered platform designed to assist job seekers in optimizing their resumes for Applicant Tracking Systems (ATS) and tailoring them for specific job descriptions. It also includes features for job searching and provides personalized job suggestions.
 
 ## Features
@@ -38,4 +38,5 @@ SPACY
 NLTK
 PANDAS
 PLOTLY
+
 
