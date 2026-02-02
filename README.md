@@ -140,9 +140,7 @@ pdfminer.six
 python-docx
 ```
 
----
-
-## Roadmap (what to add next)
+will add these later
 
 * Add embeddings-based semantic matching (better than keyword matching).
 * Resume version history + export tailored resume as new PDF.
@@ -150,6 +148,7 @@ python-docx
 * CLI tool to bulk-tailor resumes for many JDs.
 
 ---
+
 
 
 
